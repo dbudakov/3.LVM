@@ -7,3 +7,6 @@ grub-mkconfig /boot/grub/grub.cfg /dev/sda
 Дополнительно
 drbddrbd  
 drbddrbd + corosync + pacemaker   
+
+мы использовали таблицу разделов типа gpt, но можно выбрать одну из этих: aix, amiga, bsd, dvh, gpt_sync_mbr, gpt, mac, msdos, pc98, sun, loop
+
