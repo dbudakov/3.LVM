@@ -1,3 +1,7 @@
+```sh
+scriptreplay <time.file> <log.file>  
+```
+
 # 3.LVM
 
 ### Дополнительно
