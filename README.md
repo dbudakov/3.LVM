@@ -22,47 +22,50 @@ mount /dev/vg_root/lv_root /mnt
 # Расширение lvm тома
 umount /mnt
 
-# через добавление нового тома
-	$fdisk /dev/sdb 
-		>n
-		>p
-		>3
-		>t
-		>8e
-		>w
-	partprobe 
-	
-	partition=/dev/sdb2
-	pvcreate ${partition}
+#if через удаление и переназначение старого тома
+fdisk /dev/sdb 
+	>d
+	>n
+	>p
+	>3
+	>t
+	>8e
+	>w
+partprobe 
 
-# через удаление и переназначение старого тома
-	fdisk /dev/sdb 
-		>d
-		>n
-		>p
-		>3
-		>t
-		>8e
-		>w
-		>partprobe 
+partition=/dev/sdb1
+pvresize ${partition}
+
+#else через добавление нового тома
+fdisk /dev/sdb 
+	>n
+	>p
+	>3
+	>t
+	>8e
+	>w
+partprobe 
 	
-	partition=/dev/sdb1
-	pvresize ${partition}
+partition=/dev/sdb2
+pvcreate ${partition}
+
+
+
+#endif
 
 num_vg=1
-vg_root=$(vgdisplay| awk '/VG Name/ {print $3}'|sed -n ${num_vg})
-vgextend ${vg_root} ${patition}
+vg_root=$(vgdisplay| awk '/VG Name/ {print $3}'|sed -n ${num_vg}p)
+vgextend ${vg_root} ${partition}
+
 
 num_lv=1
-lv_root=lvdisplay| awk '/LV Name/ && NR = 1 {print $3}' | sed -n ${num_lv}p
-
 size=$(vgdisplay |awk '/Free/ {print $5}')
-lv_path=lvdisplay| awk '/LV Path/ && NR = 1 {print $3}' | sed -n ${num_lv}p
+lv_path=$(lvdisplay| awk '/LV Path/ && NR = 1 {print $3}' | sed -n ${num_lv}p)
 lvextend -l +${size} ${lv_path}
 
 # if file system is xfs use xfs_growfs, check fs `blkid`
 #resize2fs /dev/vg_root/lv_root 
-xfs_growfs /dev/vg_root/lv_root 
+xfs_growfs ${lv_path} 
 df -h
 ```
 
