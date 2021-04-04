@@ -1,16 +1,47 @@
 # LVM
 
-Создание lvm
+Расширение LVM
+```sh
+yum install lvm2
+
+fdisk /dev/sdb 
+	n
+	p
+	3
+	t
+	8e
+	w
+partprobe
+pvcreate /dev/sdb1
+vgcreate vg_root /dev/sdb1
+lvcreate -n lv_root -l100%FREE /dev/vg_root
+mkfs.xfs /dev/vg_root/lv_root 
+mount /dev/vg_root/lv_root /mnt
+
+umount /mnt
+fdisk /dev/sdb 
+	n
+	p
+	3
+	t
+	8e
+	w
+partprobe 
+pvcreate /dev/sdb2
+vgextend vg_root /dev/sdb2
+vgdisplay |awk '/Free/ {print $5}'
+lvextend -l +$(vgdisplay |awk '/Free/ {print $5}') /dev/vg_root/lv_root
+
+# if file system is xfs use xfs_growfs
+#resize2fs /dev/vg_root/lv_root 
+xfs_growfs /dev/vg_root/lv_root 
+df -h
+```
+
+начало переноса primary lvm
 
 ```sh
 yum install lvm2 hfsdump
-
-lvm
-vcreate /dev/sdb
-vgcreate vg_root /dev/sdb
-lvcreate -n lv_root -l100%FREE /dev/vg_root
-
-mkfs.xfs /dev/vg_root/lv_root
 mount /dev/vg_root/lv_root /mnt
 xfsdump -J - /dev/sda1 |xfsrestore -J - /mnt
 umount /dev/sda1
