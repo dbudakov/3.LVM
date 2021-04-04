@@ -1,4 +1,4 @@
-объединение двую линукс систем  
+объединение двух линукс систем  
 grub-mkconfig -o /boot/grub/grub.cfg  
 grub-mkconfig /boot/grub/grub.cfg /dev/sda  
 Добавить опцию --class os --unrestricted в строку menuentry требуемой ОС в конфиге загрузчика /boot/grub/grub.cfg  
