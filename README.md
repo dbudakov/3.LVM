@@ -6,12 +6,12 @@ yum install lvm2
 
 # Создание lvm тома
 fdisk /dev/sdb 
-	n
-	p
-	3
-	t
-	8e
-	w
+	>n
+	>p
+	>3
+	>t
+	>8e
+	>w
 partprobe
 pvcreate /dev/sdb1
 vgcreate vg_root /dev/sdb1
@@ -23,13 +23,13 @@ mount /dev/vg_root/lv_root /mnt
 umount /mnt
 
 # через добавление нового тома
-	fdisk /dev/sdb 
-		n
-		p
-		3
-		t
-		8e
-		w
+	$fdisk /dev/sdb 
+		>n
+		>p
+		>3
+		>t
+		>8e
+		>w
 	partprobe 
 	
 	partition=/dev/sdb2
@@ -37,14 +37,14 @@ umount /mnt
 
 # через удаление и переназначение старого тома
 	fdisk /dev/sdb 
-		d
-		n
-		p
-		3
-		t
-		8e
-		w
-		partprobe 
+		>d
+		>n
+		>p
+		>3
+		>t
+		>8e
+		>w
+		>partprobe 
 	
 	partition=/dev/sdb1
 	pvresize ${partition}
