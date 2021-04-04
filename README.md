@@ -36,7 +36,7 @@ lvdisplay| awk '/Name/ {print $2}'
 vgdisplay |awk '/Free/ {print $5}'
 lvextend -l +$(vgdisplay |awk '/Free/ {print $5}') /dev/vg_root/lv_root
 
-# if file system is xfs use xfs_growfs
+# if file system is xfs use xfs_growfs, check fs `blkid`
 #resize2fs /dev/vg_root/lv_root 
 xfs_growfs /dev/vg_root/lv_root 
 df -h
