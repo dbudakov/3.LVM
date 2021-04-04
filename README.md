@@ -4,6 +4,7 @@
 ```sh
 yum install lvm2
 
+# Создание lvm тома
 fdisk /dev/sdb 
 	n
 	p
@@ -13,28 +14,51 @@ fdisk /dev/sdb
 	w
 partprobe
 pvcreate /dev/sdb1
-vgdisplay| awk '/Name/ {print $2}'
 vgcreate vg_root /dev/sdb1
-lvdisplay| awk '/Name/ {print $2}'
 lvcreate -n lv_root -l100%FREE /dev/vg_root
 mkfs.xfs /dev/vg_root/lv_root 
 mount /dev/vg_root/lv_root /mnt
 
+# Расширение lvm тома
 umount /mnt
-fdisk /dev/sdb 
-	n
-	p
-	3
-	t
-	8e
-	w
-partprobe 
-pvcreate /dev/sdb2
-vgdisplay| awk '/Name/ {print $2}'
-vgextend vg_root /dev/sdb2
-lvdisplay| awk '/Name/ {print $2}'
-vgdisplay |awk '/Free/ {print $5}'
-lvextend -l +$(vgdisplay |awk '/Free/ {print $5}') /dev/vg_root/lv_root
+
+# через добавление нового тома
+	fdisk /dev/sdb 
+		n
+		p
+		3
+		t
+		8e
+		w
+	partprobe 
+	
+	partition=/dev/sdb2
+	pvcreate ${partition}
+
+# через удаление и переназначение старого тома
+	fdisk /dev/sdb 
+		d
+		n
+		p
+		3
+		t
+		8e
+		w
+		partprobe 
+	
+	partition=/dev/sdb1
+	pvresize ${partition}
+
+num_vg=1
+vg_root=$(vgdisplay| awk '/VG Name/ {print $3}'|sed -n ${num_vg})
+vgextend ${vg_root} ${patition}
+
+num_lv=1
+lv_root=lvdisplay| awk '/LV Name/ && NR = 1 {print $3}' | sed -n ${num_lv}p
+
+size=$(vgdisplay |awk '/Free/ {print $5}')
+lv_path=lvdisplay| awk '/LV Path/ && NR = 1 {print $3}' | sed -n ${num_lv}p
+lvextend -l +${size} ${lv_path}
 
 # if file system is xfs use xfs_growfs, check fs `blkid`
 #resize2fs /dev/vg_root/lv_root 
