@@ -13,7 +13,9 @@ fdisk /dev/sdb
 	w
 partprobe
 pvcreate /dev/sdb1
+vgdisplay| awk '/Name/ {print $2}'
 vgcreate vg_root /dev/sdb1
+lvdisplay| awk '/Name/ {print $2}'
 lvcreate -n lv_root -l100%FREE /dev/vg_root
 mkfs.xfs /dev/vg_root/lv_root 
 mount /dev/vg_root/lv_root /mnt
@@ -28,7 +30,9 @@ fdisk /dev/sdb
 	w
 partprobe 
 pvcreate /dev/sdb2
+vgdisplay| awk '/Name/ {print $2}'
 vgextend vg_root /dev/sdb2
+lvdisplay| awk '/Name/ {print $2}'
 vgdisplay |awk '/Free/ {print $5}'
 lvextend -l +$(vgdisplay |awk '/Free/ {print $5}') /dev/vg_root/lv_root
 
