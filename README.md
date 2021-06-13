@@ -5,6 +5,8 @@
 yum install lvm2
 
 # Создание lvm тома
+printf "n\np\n\n\n\nw\n" |fdisk /dev/sdb 
+  or
 fdisk /dev/sdb 
 	>n
 	>p
@@ -15,7 +17,9 @@ fdisk /dev/sdb
 partprobe
 pvcreate /dev/sdb1
 vgcreate vg_root /dev/sdb1
-lvcreate -n lv_root -l100%FREE /dev/vg_root
+lvcreate -n lv_root -l10%FREE /dev/vg_root
+#for mirror
+#lvcreate -L 500M -m1 -n mirrorlv vg_root
 mkfs.xfs /dev/vg_root/lv_root 
 mount /dev/vg_root/lv_root /mnt
 
